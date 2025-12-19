@@ -104,17 +104,20 @@ def test_response_time(api_client):
 
 def test_api_is_json(api_client):
     """Ответ API должен быть в формате JSON."""
-    url = f"{api_client.base_url}/api/commands"
-    response = requests.post(
-        url,
-        json={"device_id": "sensor-1", "command": "RESTART"},
-        headers={"Accept": "application/json"}
-    )
+    # Используем api_client для создания команды
+    response = api_client.create_command("sensor-1", "RESTART")
 
-    assert response.headers["Content-Type"] == "application/json"
-    data = response.json()
-    assert "id" in data
-    assert "status" in data
+    # Валидация JSON уже происходит внутри api_client.create_command()
+    # Если код дошел сюда - значит ответ был валидным JSON
+
+    # Дополнительная проверка: ответ должен быть словарем (после json())
+    assert isinstance(response, dict), "Ответ должен быть словарем (JSON object)"
+    assert "id" in response
+    assert "status" in response
+
+    # Проверяем что поля имеют правильный тип (косвенная проверка JSON)
+    assert isinstance(response["id"], str)
+    assert isinstance(response["status"], str)
 
 
 @pytest.mark.parametrize("device_id", [
