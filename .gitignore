@@ -1,33 +1,6 @@
-# Файлы Python
-__pycache__/          # Кэш байткода Python
-*.py[cod]             # Скомпилированные файлы Python
-*$py.class            # Файлы классов
-*.so                  # Сишные расширения
-.env                  # Файлы с переменными окружения (часто содержат пароли!)
-.venv                 # Виртуальное окружение
-env/
+__pycache__/
+*.pyc
+.venv/
 venv/
-ENV/
-
-# Зависимости Python
-*.egg-info/           # Информация о пакетах
-.eggs/                # Яйца пакетов
-dist/                 # Дистрибутивы
-build/                # Сборки
-
-# Логи и тестовые данные
-*.log                 # Лог-файлы
-test_reports/         # Отчеты тестов
-htmlcov/              # Отчеты покрытия
-.coverage             # Данные покрытия кода
-
-# Настройки IDE
-.vscode/              # Настройки VS Code
-.idea/                # Настройки PyCharm/IntelliJ
-*.swp                 # Временные файлы Vim
-*.swo
-
-# Файлы операционной системы
-.DS_Store            # macOS служебные файлы
-Thumbs.db            # Windows preview кэш
-desktop.ini          # Windows настройки папок
+.env
+.DS_Store
