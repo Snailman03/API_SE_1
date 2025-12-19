@@ -72,3 +72,59 @@ def test_command_id_format(api_client):
     assert response["id"].startswith("cmd-")
     assert len(response["id"]) > 5
 
+
+def test_command_not_found(api_client):
+    """Запрос несуществующей команды -> 404."""
+    with pytest.raises(Exception) as error:
+        api_client.get_command_status("non-existing-cmd-123")
+    assert error.value.response.status_code == 404
+
+
+def test_multiple_commands_for_same_device(api_client):
+    """Несколько команд для одного устройства."""
+    cmd1 = api_client.create_command("sensor-1", "RESTART")
+    cmd2 = api_client.create_command("sensor-1", "STATUS")
+
+    assert cmd1["id"] != cmd2["id"]
+    assert cmd1["status"] == "NEW"
+    assert cmd2["status"] == "NEW"
+
+
+def test_response_time(api_client):
+    """Время ответа API должно быть разумным."""
+    import time
+
+    start = time.time()
+    response = api_client.create_command("sensor-1", "RESTART")
+    elapsed = time.time() - start
+
+    assert elapsed < 3.0, f"Создание команды заняло {elapsed:.2f} секунд"
+    assert response["status"] == "NEW"
+
+
+def test_api_is_json(api_client):
+    """Ответ API должен быть в формате JSON."""
+    url = f"{api_client.base_url}/api/commands"
+    response = requests.post(
+        url,
+        json={"device_id": "sensor-1", "command": "RESTART"},
+        headers={"Accept": "application/json"}
+    )
+
+    assert response.headers["Content-Type"] == "application/json"
+    data = response.json()
+    assert "id" in data
+    assert "status" in data
+
+
+@pytest.mark.parametrize("device_id", [
+    "very-long-device-id-" + "x" * 50,  # Длинный ID
+    "device-with-dash",
+    "device_with_underscore",
+    "device.with.dots",
+    "device123",
+])
+def test_various_device_id_formats(api_client, device_id):
+    """Различные форматы device_id."""
+    response = api_client.create_command(device_id, "RESTART")
+    assert response["status"] == "NEW"
